@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commodity Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📦 Commodity Management System</h1>
+            <p class="subtitle">Aera Orchestration Framework - Supply Chain Decision Management</p>
+            <div class="role-switcher">
+                <span class="role-label">Current Role: </span>
+                <select id="roleSelector">
+                    <option value="pilot">👨‍✈️ Pilot</option>
+                    <option value="admin">🔧 Admin</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Admin Panel - Only visible for admin role -->
+            <div id="adminPanel" class="admin-panel hidden">
+                <div class="panel-header">
+                    <h2>⚙️ Admin Panel - Rules & Policies</h2>
+                    <button class="btn btn-primary btn-sm" onclick="openRuleModal()">+ Add New Rule</button>
+                </div>
+                
+                <div class="aera-framework-info">
+                    <h3>Aera Orchestration Framework</h3>
+                    <div class="framework-steps">
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <span class="step-title">Threshold KPI Triggers</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <span class="step-title">Solutions Analyzed</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <span class="step-title">Recommendation</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <span class="step-title">User Selects Action</span>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">5</span>
+                            <span class="step-title">System Learns</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rules-section">
+                    <h3>Active Rules & Policies</h3>
+                    <div id="rulesList" class="rules-list"></div>
+                </div>
+            </div>
+
+            <!-- Pilot Panel - Commodity Management -->
+            <div id="pilotPanel" class="pilot-panel">
+                <div class="input-section">
+                    <form id="commodityForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="commodityId">Commodity ID</label>
+                                <input type="text" id="commodityId" placeholder="e.g., CMP-001" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="commodityName">Commodity Name</label>
+                                <input type="text" id="commodityName" placeholder="e.g., Widget A" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="quantity">Quantity</label>
+                                <input type="number" id="quantity" placeholder="e.g., 1000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="kpiTrigger">KPI Trigger</label>
+                                <select id="kpiTrigger" required>
+                                    <option value="">Select KPI Trigger...</option>
+                                    <option value="dsi_threshold">Proj. DSI < 30% Target DSI from ILTS</option>
+                                    <option value="stockout_risk">Stockout Risk > Threshold</option>
+                                    <option value="excess_inventory">Excess Inventory > Target</option>
+                                    <option value="lead_time">Lead Time Deviation > 20%</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="grain">Grain</label>
+                            <select id="grain" required>
+                                <option value="CFG-site-week">CFG-site-week</option>
+                                <option value="CFG-site-month">CFG-site-month</option>
+                                <option value="CFG-region-week">CFG-region-week</option>
+                                <option value="CFG-global-week">CFG-global-week</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memoryLayer">Memory Layer (MemoryOS Structure)</label>
+                            <select id="memoryLayer" required>
+                                <option value="short_term">🧠 Short-term Memory (Recent Interactions)</option>
+                                <option value="mid_term">🔄 Mid-term Memory (Consolidated Interactions)</option>
+                                <option value="long_term">💾 Long-term Memory (Patterns & Knowledge)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="decision">Recommended Decision</label>
+                            <select id="decision" required>
+                                <option value="">Select Decision...</option>
+                                <option value="repoint_orders">Repoint Orders</option>
+                                <option value="redirect_shipments">Redirect Shipments</option>
+                                <option value="expedite_fb_tt">Expedite by FB / TT</option>
+                                <option value="rebalance_inventory">Rebalance Inventory</option>
+                                <option value="modify_commits">Modify Commits</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userDecision">Your Decision</label>
+                            <select id="userDecision" required>
+                                <option value="">Select Your Decision...</option>
+                                <option value="accepted">✅ Accept Recommendation</option>
+                                <option value="rejected">❌ Reject Recommendation</option>
+                                <option value="modified">🔄 Modify Recommendation</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userNotes">User Notes (Reason for decision)</label>
+                            <textarea id="userNotes" rows="3" placeholder="Explain why you accepted or rejected this recommendation..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tags">Tags (comma-separated)</label>
+                            <input type="text" id="tags" placeholder="e.g., urgent, shortage, mitigation">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">💾 Submit Commodity Decision</button>
+                    </form>
+                </div>
+
+                <div class="search-section">
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="🔍 Search commodities...">
+                        <select id="filterStatus">
+                            <option value="all">All Status</option>
+                            <option value="accepted">Accepted</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="modified">Modified</option>
+                        </select>
+                        <select id="filterDecision">
+                            <option value="all">All Decisions</option>
+                            <option value="repoint_orders">Repoint Orders</option>
+                            <option value="redirect_shipments">Redirect Shipments</option>
+                            <option value="expedite_fb_tt">Expedite by FB/TT</option>
+                            <option value="rebalance_inventory">Rebalance Inventory</option>
+                            <option value="modify_commits">Modify Commits</option>
+                        </select>
+                        <select id="filterMemoryLayer">
+                            <option value="all">All Memory Layers</option>
+                            <option value="short_term">🧠 Short-term</option>
+                            <option value="mid_term">🔄 Mid-term</option>
+                            <option value="long_term">💾 Long-term</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="memory-management-section">
+                    <div class="memory-management-header">
+                        <h3>Memory Layer Management</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="commodityManager.promoteMemories()">⬆️ Promote Memories</button>
+                        <button class="btn btn-secondary btn-sm" onclick="commodityManager.consolidateMemories()">🔄 Consolidate</button>
+                    </div>
+                    <div class="memory-stats">
+                        <div class="memory-stat">
+                            <span class="stat-label">🧠 Short-term</span>
+                            <span class="stat-value" id="shortTermCount">0</span>
+                        </div>
+                        <div class="memory-stat">
+                            <span class="stat-label">🔄 Mid-term</span>
+                            <span class="stat-value" id="midTermCount">0</span>
+                        </div>
+                        <div class="memory-stat">
+                            <span class="stat-label">💾 Long-term</span>
+                            <span class="stat-value" id="longTermCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="commodities-section">
+                    <div class="commodities-header">
+                        <h2>Commodity Decisions</h2>
+                        <span id="commodityCount" class="commodity-count">0 commodities</span>
+                    </div>
+                    <div id="commoditiesList" class="commodities-list">
+                        <div class="empty-state">
+                            <div class="empty-icon">�</div>
+                            <p>No commodity decisions yet. Start by submitting your first decision!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commodity Edit Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Commodity Decision</h2>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editCommodityName">Commodity Name</label>
+                    <input type="text" id="editCommodityName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editQuantity">Quantity</label>
+                    <input type="number" id="editQuantity" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserDecision">Your Decision</label>
+                    <select id="editUserDecision" required>
+                        <option value="accepted">✅ Accept Recommendation</option>
+                        <option value="rejected">❌ Reject Recommendation</option>
+                        <option value="modified">🔄 Modify Recommendation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editUserNotes">User Notes</label>
+                    <textarea id="editUserNotes" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Update Decision</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rule Modal (Admin) -->
+    <div id="ruleModal" class="modal">
+        <div class="modal-content modal-lg">
+            <span class="close-rule">&times;</span>
+            <h2 id="ruleModalTitle">Add New Rule</h2>
+            <form id="ruleForm">
+                <div class="form-group">
+                    <label for="ruleName">Rule Name</label>
+                    <input type="text" id="ruleName" placeholder="e.g., DSI Threshold Rule" required>
+                </div>
+                <div class="form-group">
+                    <label for="ruleTrigger">KPI Trigger Condition</label>
+                    <input type="text" id="ruleTrigger" placeholder="e.g., Proj. DSI < 30% Target DSI" required>
+                </div>
+                <div class="form-group">
+                    <label for="ruleDecision">Recommended Decision</label>
+                    <select id="ruleDecision" required>
+                        <option value="repoint_orders">Repoint Orders</option>
+                        <option value="redirect_shipments">Redirect Shipments</option>
+                        <option value="expedite_fb_tt">Expedite by FB/TT</option>
+                        <option value="rebalance_inventory">Rebalance Inventory</option>
+                        <option value="modify_commits">Modify Commits</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ruleBusinessProcess">Business Process</label>
+                    <input type="text" id="ruleBusinessProcess" placeholder="e.g., Move customer backlog order from one FC to another" required>
+                </div>
+                <div class="form-group">
+                    <label for="ruleWritebackTool">Writeback Tool</label>
+                    <input type="text" id="ruleWritebackTool" placeholder="e.g., OFS" required>
+                </div>
+                <div class="form-group">
+                    <label for="ruleDescription">Description</label>
+                    <textarea id="ruleDescription" rows="3" placeholder="Describe when and how this rule should be applied..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save Rule</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
