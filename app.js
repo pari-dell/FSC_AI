@@ -72,7 +72,7 @@ class CommodityManager {
         document.getElementById('ruleForm').addEventListener('submit', (e) => this.saveRule(e));
         document.getElementById('searchInput').addEventListener('input', (e) => this.filterCommodities(e));
         document.getElementById('filterStatus').addEventListener('change', (e) => this.filterCommodities(e));
-        document.getElementById('filterDecision').addEventListener('change', (e) => this.filterCommodities(e));
+        document.getElementById('filterRecommendationType').addEventListener('change', (e) => this.filterCommodities(e));
         document.getElementById('filterMemoryLayer').addEventListener('change', (e) => this.filterCommodities(e));
         
         const modal = document.getElementById('modal');
@@ -114,31 +114,30 @@ class CommodityManager {
     addCommodity(e) {
         e.preventDefault();
         
-        const commodityId = document.getElementById('commodityId').value.trim();
-        const commodityName = document.getElementById('commodityName').value.trim();
-        const quantity = parseInt(document.getElementById('quantity').value);
-        const kpiTrigger = document.getElementById('kpiTrigger').value;
-        const grain = document.getElementById('grain').value;
-        const decision = document.getElementById('decision').value;
-        const userDecision = document.getElementById('userDecision').value;
+        const sourceTable = document.getElementById('sourceTable').value.trim();
+        const recommendationType = document.getElementById('recommendationType').value;
+        const actionDate = document.getElementById('actionDate').value.trim();
+        const actionTaken = document.getElementById('actionTaken').value;
+        const comment = document.getElementById('comment').value.trim();
         const userNotes = document.getElementById('userNotes').value.trim();
         const tagsInput = document.getElementById('tags').value.trim();
         const memoryLayer = document.getElementById('memoryLayer').value || 'short_term';
+        const memoryType = document.getElementById('memoryType').value || 'episodic';
         
         const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
         
         const commodity = {
             id: Date.now(),
-            commodityId,
-            commodityName,
-            quantity,
-            kpiTrigger,
-            grain,
-            recommendedDecision: decision,
-            userDecision,
+            sourceTable,
+            recommendationType,
+            actionDate,
+            actionTaken,
+            comment,
+            userDecision: actionTaken,
             userNotes,
             tags,
             memoryLayer,
+            memoryType,
             accessCount: 0,
             lastAccessed: new Date().toISOString(),
             createdAt: new Date().toISOString(),
@@ -150,42 +149,53 @@ class CommodityManager {
         this.renderCommodities();
         this.resetForm();
         
-        this.showNotification('Commodity decision submitted successfully!', 'success');
+        this.showNotification('SDO recommendation submitted successfully!', 'success');
     }
 
     updateCommodity(e) {
         e.preventDefault();
         
-        const commodityName = document.getElementById('editCommodityName').value.trim();
-        const quantity = parseInt(document.getElementById('editQuantity').value);
-        const userDecision = document.getElementById('editUserDecision').value;
+        const sourceTable = document.getElementById('editSourceTable').value.trim();
+        const recommendationType = document.getElementById('editRecommendationType').value;
+        const actionDate = document.getElementById('editActionDate').value.trim();
+        const actionTaken = document.getElementById('editActionTaken').value;
+        const comment = document.getElementById('editComment').value.trim();
         const userNotes = document.getElementById('editUserNotes').value.trim();
+        const tagsInput = document.getElementById('editTags').value.trim();
+        const memoryType = document.getElementById('editMemoryType').value;
+        
+        const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
         
         const commodityIndex = this.commodities.findIndex(c => c.id === this.currentEditId);
         
         if (commodityIndex !== -1) {
             this.commodities[commodityIndex] = {
                 ...this.commodities[commodityIndex],
-                commodityName,
-                quantity,
-                userDecision,
+                sourceTable,
+                recommendationType,
+                actionDate,
+                actionTaken,
+                comment,
+                userDecision: actionTaken,
                 userNotes,
+                tags,
+                memoryType,
                 updatedAt: new Date().toISOString()
             };
             
             this.saveCommoditiesToStorage();
             this.renderCommodities();
             this.closeModal();
-            this.showNotification('Commodity decision updated successfully!', 'success');
+            this.showNotification('SDO recommendation updated successfully!', 'success');
         }
     }
 
     deleteCommodity(id) {
-        if (confirm('Are you sure you want to delete this commodity decision?')) {
+        if (confirm('Are you sure you want to delete this SDO recommendation?')) {
             this.commodities = this.commodities.filter(c => c.id !== id);
             this.saveCommoditiesToStorage();
             this.renderCommodities();
-            this.showNotification('Commodity decision deleted successfully!', 'success');
+            this.showNotification('SDO recommendation deleted successfully!', 'success');
         }
     }
 
@@ -194,10 +204,14 @@ class CommodityManager {
         
         if (commodity) {
             this.currentEditId = id;
-            document.getElementById('editCommodityName').value = commodity.commodityName;
-            document.getElementById('editQuantity').value = commodity.quantity;
-            document.getElementById('editUserDecision').value = commodity.userDecision;
+            document.getElementById('editSourceTable').value = commodity.sourceTable;
+            document.getElementById('editRecommendationType').value = commodity.recommendationType;
+            document.getElementById('editActionDate').value = commodity.actionDate || '';
+            document.getElementById('editActionTaken').value = commodity.actionTaken;
+            document.getElementById('editComment').value = commodity.comment || '';
             document.getElementById('editUserNotes').value = commodity.userNotes;
+            document.getElementById('editTags').value = commodity.tags.join(', ');
+            document.getElementById('editMemoryType').value = commodity.memoryType || 'episodic';
             
             document.getElementById('modal').classList.add('show');
         }
@@ -212,26 +226,27 @@ class CommodityManager {
     filterCommodities() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const statusFilter = document.getElementById('filterStatus').value;
-        const decisionFilter = document.getElementById('filterDecision').value;
+        const recommendationTypeFilter = document.getElementById('filterRecommendationType').value;
         const memoryLayerFilter = document.getElementById('filterMemoryLayer').value;
         
         let filtered = this.commodities;
         
         if (searchTerm) {
             filtered = filtered.filter(commodity => 
-                commodity.commodityId.toLowerCase().includes(searchTerm) ||
-                commodity.commodityName.toLowerCase().includes(searchTerm) ||
+                commodity.sourceTable.toLowerCase().includes(searchTerm) ||
+                commodity.recommendationType.toLowerCase().includes(searchTerm) ||
                 commodity.userNotes.toLowerCase().includes(searchTerm) ||
+                commodity.comment.toLowerCase().includes(searchTerm) ||
                 commodity.tags.some(tag => tag.toLowerCase().includes(searchTerm))
             );
         }
         
         if (statusFilter !== 'all') {
-            filtered = filtered.filter(commodity => commodity.userDecision === statusFilter);
+            filtered = filtered.filter(commodity => commodity.actionTaken === statusFilter);
         }
         
-        if (decisionFilter !== 'all') {
-            filtered = filtered.filter(commodity => commodity.recommendedDecision === decisionFilter);
+        if (recommendationTypeFilter !== 'all') {
+            filtered = filtered.filter(commodity => commodity.recommendationType === recommendationTypeFilter);
         }
         
         if (memoryLayerFilter !== 'all') {
@@ -245,14 +260,15 @@ class CommodityManager {
         const container = document.getElementById('commoditiesList');
         const countElement = document.getElementById('commodityCount');
         
-        countElement.textContent = `${commoditiesToRender.length} commodities`;
+        countElement.textContent = `${commoditiesToRender.length} recommendations`;
         this.updateMemoryStats();
+        this.updateMemoryTypeStats();
         
         if (commoditiesToRender.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-icon">📦</div>
-                    <p>No commodity decisions found. ${this.commodities.length === 0 ? 'Start by submitting your first decision!' : 'Try adjusting your search or filters.'}</p>
+                    <div class="empty-icon">📊</div>
+                    <p>No SDO recommendations found. ${this.commodities.length === 0 ? 'Start by submitting your first recommendation!' : 'Try adjusting your search or filters.'}</p>
                 </div>
             `;
             return;
@@ -262,32 +278,31 @@ class CommodityManager {
             <div class="commodity-card">
                 <div class="commodity-card-header">
                     <div>
-                        <div class="commodity-card-id">${this.escapeHtml(commodity.commodityId)}</div>
-                        <h3 class="commodity-card-name">${this.escapeHtml(commodity.commodityName)}</h3>
+                        <div class="commodity-card-id">${this.escapeHtml(commodity.sourceTable)}</div>
+                        <h3 class="commodity-card-name">${this.escapeHtml(commodity.recommendationType)}</h3>
                     </div>
                     <div class="commodity-card-badges">
-                        <span class="commodity-card-status ${commodity.userDecision}">${this.getStatusLabel(commodity.userDecision)}</span>
+                        <span class="commodity-card-status ${commodity.actionTaken}">${this.getActionLabel(commodity.actionTaken)}</span>
                         <span class="commodity-card-memory-layer ${commodity.memoryLayer}">${this.getMemoryLayerLabel(commodity.memoryLayer)}</span>
+                        <span class="memory-type-badge ${commodity.memoryType || 'episodic'}">${this.getMemoryTypeLabel(commodity.memoryType)}</span>
                     </div>
                 </div>
                 <div class="commodity-card-body">
                     <div class="commodity-card-field">
-                        <div class="commodity-card-field-label">Quantity</div>
-                        <div class="commodity-card-field-value">${commodity.quantity.toLocaleString()}</div>
+                        <div class="commodity-card-field-label">Action Date</div>
+                        <div class="commodity-card-field-value">${this.escapeHtml(commodity.actionDate || 'N/A')}</div>
                     </div>
                     <div class="commodity-card-field">
-                        <div class="commodity-card-field-label">KPI Trigger</div>
-                        <div class="commodity-card-field-value">${this.getKPITriggerLabel(commodity.kpiTrigger)}</div>
-                    </div>
-                    <div class="commodity-card-field">
-                        <div class="commodity-card-field-label">Grain</div>
-                        <div class="commodity-card-field-value">${commodity.grain}</div>
-                    </div>
-                    <div class="commodity-card-field">
-                        <div class="commodity-card-field-label">Recommended Decision</div>
-                        <div class="commodity-card-field-value">${this.getDecisionLabel(commodity.recommendedDecision)}</div>
+                        <div class="commodity-card-field-label">Action Taken</div>
+                        <div class="commodity-card-field-value">${this.escapeHtml(commodity.actionTaken)}</div>
                     </div>
                 </div>
+                ${commodity.comment ? `
+                    <div class="commodity-card-notes">
+                        <div class="commodity-card-notes-label">Recommendation Comment</div>
+                        <div class="commodity-card-notes-content">${this.escapeHtml(commodity.comment)}</div>
+                    </div>
+                ` : ''}
                 <div class="commodity-card-notes">
                     <div class="commodity-card-notes-label">User Notes (Reason for Decision)</div>
                     <div class="commodity-card-notes-content">${this.escapeHtml(commodity.userNotes)}</div>
@@ -452,9 +467,9 @@ class CommodityManager {
 
     getStatusLabel(status) {
         const labels = {
-            'accepted': '✅ Accepted',
-            'rejected': '❌ Rejected',
-            'modified': '🔄 Modified'
+            'Accepted': '✅ Accepted',
+            'Rejected': '❌ Rejected',
+            'Auto-Accepted': '🤖 Auto-Accepted'
         };
         return labels[status] || status;
     }
@@ -467,6 +482,25 @@ class CommodityManager {
             'lead_time': 'Lead Time Deviation > 20%'
         };
         return labels[trigger] || trigger;
+    }
+
+    getActionLabel(action) {
+        const labels = {
+            'Accepted': '✅ Accepted',
+            'Rejected': '❌ Rejected',
+            'Auto-Accepted': '🤖 Auto-Accepted'
+        };
+        return labels[action] || action;
+    }
+
+    getMemoryTypeLabel(type) {
+        const labels = {
+            'episodic': '🎭 Episodic',
+            'procedural': '⚙️ Procedural',
+            'semantic': '🧠 Semantic',
+            'persona': '👤 Persona'
+        };
+        return labels[type] || type;
     }
 
     getDecisionLabel(decision) {
@@ -497,6 +531,18 @@ class CommodityManager {
         document.getElementById('shortTermCount').textContent = shortTermCount;
         document.getElementById('midTermCount').textContent = midTermCount;
         document.getElementById('longTermCount').textContent = longTermCount;
+    }
+
+    updateMemoryTypeStats() {
+        const episodicCount = this.commodities.filter(c => c.memoryType === 'episodic').length;
+        const proceduralCount = this.commodities.filter(c => c.memoryType === 'procedural').length;
+        const semanticCount = this.commodities.filter(c => c.memoryType === 'semantic').length;
+        const personaCount = this.commodities.filter(c => c.memoryType === 'persona').length;
+
+        document.getElementById('episodicCount').textContent = episodicCount;
+        document.getElementById('proceduralCount').textContent = proceduralCount;
+        document.getElementById('semanticCount').textContent = semanticCount;
+        document.getElementById('personaCount').textContent = personaCount;
     }
 
     accessCommodity(id) {
@@ -575,6 +621,110 @@ class CommodityManager {
             this.showNotification(`${consolidatedCount} memories consolidated to higher layers`, 'success');
         } else {
             this.showNotification('No memories eligible for consolidation', 'info');
+        }
+    }
+
+    evolveMemories() {
+        let evolvedCount = 0;
+        
+        // Group memories by pattern to detect evolution triggers
+        const patternGroups = {};
+        
+        this.commodities.forEach(commodity => {
+            if (commodity.memoryType === 'episodic') {
+                // Check for action pattern repetition (EPISODIC → PROCEDURAL)
+                const actionPattern = `${commodity.recommendationType}_${commodity.actionTaken}`;
+                if (!patternGroups[actionPattern]) {
+                    patternGroups[actionPattern] = [];
+                }
+                patternGroups[actionPattern].push(commodity);
+            }
+        });
+
+        // EPISODIC → PROCEDURAL: When same action pattern repeats 3+ times
+        Object.keys(patternGroups).forEach(pattern => {
+            const memories = patternGroups[pattern];
+            if (memories.length >= 3) {
+                memories.forEach(memory => {
+                    if (memory.memoryType === 'episodic') {
+                        memory.memoryType = 'procedural';
+                        evolvedCount++;
+                    }
+                });
+            }
+        });
+
+        // EPISODIC → SEMANTIC: When same recommendation type has consistent outcomes
+        const outcomeGroups = {};
+        this.commodities.forEach(commodity => {
+            if (commodity.memoryType === 'episodic') {
+                if (!outcomeGroups[commodity.recommendationType]) {
+                    outcomeGroups[commodity.recommendationType] = {};
+                }
+                const outcome = commodity.actionTaken;
+                if (!outcomeGroups[commodity.recommendationType][outcome]) {
+                    outcomeGroups[commodity.recommendationType][outcome] = 0;
+                }
+                outcomeGroups[commodity.recommendationType][outcome]++;
+            }
+        });
+
+        Object.keys(outcomeGroups).forEach(recType => {
+            const outcomes = outcomeGroups[recType];
+            const total = Object.values(outcomes).reduce((a, b) => a + b, 0);
+            // If 80%+ of same recommendation type has same outcome, it's semantic
+            Object.keys(outcomes).forEach(outcome => {
+                if (outcomes[outcome] / total >= 0.8 && total >= 4) {
+                    this.commodities.forEach(commodity => {
+                        if (commodity.recommendationType === recType && 
+                            commodity.actionTaken === outcome && 
+                            commodity.memoryType === 'episodic') {
+                            commodity.memoryType = 'semantic';
+                            evolvedCount++;
+                        }
+                    });
+                }
+            });
+        });
+
+        // EPISODIC → PERSONA: When user consistently rejects/accepts certain types
+        const userPatterns = {};
+        this.commodities.forEach(commodity => {
+            if (commodity.memoryType === 'episodic') {
+                const pattern = `${commodity.recommendationType}_${commodity.actionTaken}`;
+                if (!userPatterns[pattern]) {
+                    userPatterns[pattern] = 0;
+                }
+                userPatterns[pattern]++;
+            }
+        });
+
+        Object.keys(userPatterns).forEach(pattern => {
+            if (userPatterns[pattern] >= 5) {
+                const [recType, action] = pattern.split('_');
+                this.commodities.forEach(commodity => {
+                    if (commodity.recommendationType === recType && 
+                        commodity.actionTaken === action && 
+                        commodity.memoryType === 'episodic') {
+                        commodity.memoryType = 'persona';
+                        evolvedCount++;
+                    }
+                });
+            }
+        });
+
+        // PERSONA → PROCEDURAL: When preferences become workflow rules
+        // (Already handled by the pattern repetition logic above)
+
+        // SEMANTIC → PROCEDURAL: When facts imply action rules
+        // (Already handled by the pattern repetition logic above)
+
+        if (evolvedCount > 0) {
+            this.saveCommoditiesToStorage();
+            this.renderCommodities();
+            this.showNotification(`${evolvedCount} memories evolved to higher types`, 'success');
+        } else {
+            this.showNotification('No memories eligible for evolution', 'info');
         }
     }
 

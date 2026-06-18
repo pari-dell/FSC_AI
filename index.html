@@ -9,8 +9,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>📦 Commodity Management System</h1>
-            <p class="subtitle">Aera Orchestration Framework - Supply Chain Decision Management</p>
+            <h1>� SDO Recommendation Management System</h1>
+            <p class="subtitle">Aera Orchestration Framework - Supply Chain Decision Management with MemoryOS</p>
             <div class="role-switcher">
                 <span class="role-label">Current Role: </span>
                 <select id="roleSelector">
@@ -60,46 +60,41 @@
                 </div>
             </div>
 
-            <!-- Pilot Panel - Commodity Management -->
+            <!-- Pilot Panel - SDO Recommendation Management -->
             <div id="pilotPanel" class="pilot-panel">
                 <div class="input-section">
                     <form id="commodityForm">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="commodityId">Commodity ID</label>
-                                <input type="text" id="commodityId" placeholder="e.g., CMP-001" required>
+                                <label for="sourceTable">Source Table</label>
+                                <input type="text" id="sourceTable" placeholder="e.g., DD_RECOMMENDATIONS" required>
                             </div>
                             <div class="form-group">
-                                <label for="commodityName">Commodity Name</label>
-                                <input type="text" id="commodityName" placeholder="e.g., Widget A" required>
+                                <label for="recommendationType">Recommendation Type</label>
+                                <select id="recommendationType" required>
+                                    <option value="">Select Type...</option>
+                                    <option value="Forecast Increase">📈 Forecast Increase</option>
+                                    <option value="Forecast Decrease">📉 Forecast Decrease</option>
+                                    <option value="Sales Increase">💰 Sales Increase</option>
+                                    <option value="Demand Decrease">📉 Demand Decrease</option>
+                                </select>
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="quantity">Quantity</label>
-                                <input type="number" id="quantity" placeholder="e.g., 1000" required>
+                                <label for="actionDate">Action Date</label>
+                                <input type="text" id="actionDate" placeholder="e.g., 49:03.3">
                             </div>
                             <div class="form-group">
-                                <label for="kpiTrigger">KPI Trigger</label>
-                                <select id="kpiTrigger" required>
-                                    <option value="">Select KPI Trigger...</option>
-                                    <option value="dsi_threshold">Proj. DSI < 30% Target DSI from ILTS</option>
-                                    <option value="stockout_risk">Stockout Risk > Threshold</option>
-                                    <option value="excess_inventory">Excess Inventory > Target</option>
-                                    <option value="lead_time">Lead Time Deviation > 20%</option>
+                                <label for="actionTaken">Action Taken</label>
+                                <select id="actionTaken" required>
+                                    <option value="">Select Action...</option>
+                                    <option value="Accepted">✅ Accepted</option>
+                                    <option value="Rejected">❌ Rejected</option>
+                                    <option value="Auto-Accepted">🤖 Auto-Accepted</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="grain">Grain</label>
-                            <select id="grain" required>
-                                <option value="CFG-site-week">CFG-site-week</option>
-                                <option value="CFG-site-month">CFG-site-month</option>
-                                <option value="CFG-region-week">CFG-region-week</option>
-                                <option value="CFG-global-week">CFG-global-week</option>
-                            </select>
                         </div>
 
                         <div class="form-group">
@@ -112,57 +107,49 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="decision">Recommended Decision</label>
-                            <select id="decision" required>
-                                <option value="">Select Decision...</option>
-                                <option value="repoint_orders">Repoint Orders</option>
-                                <option value="redirect_shipments">Redirect Shipments</option>
-                                <option value="expedite_fb_tt">Expedite by FB / TT</option>
-                                <option value="rebalance_inventory">Rebalance Inventory</option>
-                                <option value="modify_commits">Modify Commits</option>
+                            <label for="memoryType">Memory Type</label>
+                            <select id="memoryType" required>
+                                <option value="episodic">🎭 Episodic (Specific Events)</option>
+                                <option value="procedural">⚙️ Procedural (Action Patterns)</option>
+                                <option value="semantic">🧠 Semantic (Durable Facts)</option>
+                                <option value="persona">👤 User/Persona (Behavior Patterns)</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="userDecision">Your Decision</label>
-                            <select id="userDecision" required>
-                                <option value="">Select Your Decision...</option>
-                                <option value="accepted">✅ Accept Recommendation</option>
-                                <option value="rejected">❌ Reject Recommendation</option>
-                                <option value="modified">🔄 Modify Recommendation</option>
-                            </select>
+                            <label for="comment">Recommendation Comment</label>
+                            <textarea id="comment" rows="2" placeholder="System comment explaining the recommendation..."></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="userNotes">User Notes (Reason for decision)</label>
+                            <label for="userNotes">User Notes (Reason for Decision)</label>
                             <textarea id="userNotes" rows="3" placeholder="Explain why you accepted or rejected this recommendation..." required></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="tags">Tags (comma-separated)</label>
-                            <input type="text" id="tags" placeholder="e.g., urgent, shortage, mitigation">
+                            <input type="text" id="tags" placeholder="e.g., LO, UPP, LTS">
                         </div>
                         
-                        <button type="submit" class="btn btn-primary">💾 Submit Commodity Decision</button>
+                        <button type="submit" class="btn btn-primary">💾 Submit SDO Recommendation</button>
                     </form>
                 </div>
 
                 <div class="search-section">
                     <div class="search-bar">
-                        <input type="text" id="searchInput" placeholder="🔍 Search commodities...">
+                        <input type="text" id="searchInput" placeholder="🔍 Search recommendations...">
                         <select id="filterStatus">
-                            <option value="all">All Status</option>
-                            <option value="accepted">Accepted</option>
-                            <option value="rejected">Rejected</option>
-                            <option value="modified">Modified</option>
+                            <option value="all">All Actions</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Auto-Accepted">Auto-Accepted</option>
                         </select>
-                        <select id="filterDecision">
-                            <option value="all">All Decisions</option>
-                            <option value="repoint_orders">Repoint Orders</option>
-                            <option value="redirect_shipments">Redirect Shipments</option>
-                            <option value="expedite_fb_tt">Expedite by FB/TT</option>
-                            <option value="rebalance_inventory">Rebalance Inventory</option>
-                            <option value="modify_commits">Modify Commits</option>
+                        <select id="filterRecommendationType">
+                            <option value="all">All Types</option>
+                            <option value="Forecast Increase">📈 Forecast Increase</option>
+                            <option value="Forecast Decrease">📉 Forecast Decrease</option>
+                            <option value="Sales Increase">💰 Sales Increase</option>
+                            <option value="Demand Decrease">📉 Demand Decrease</option>
                         </select>
                         <select id="filterMemoryLayer">
                             <option value="all">All Memory Layers</option>
@@ -195,15 +182,65 @@
                     </div>
                 </div>
 
+                <div class="memory-evolution-section">
+                    <div class="memory-evolution-header">
+                        <h3>Memory Type Evolution Map</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="commodityManager.evolveMemories()">🔄 Evolve Memories</button>
+                    </div>
+                    <div class="memory-evolution-map">
+                        <div class="evolution-node episodic">
+                            <div class="node-title">EPISODIC</div>
+                            <div class="node-desc">Specific past events, actions, outcomes</div>
+                        </div>
+                        <div class="evolution-arrows">
+                            <div class="arrow">→</div>
+                            <div class="arrow">→</div>
+                            <div class="arrow">→</div>
+                        </div>
+                        <div class="evolution-destinations">
+                            <div class="evolution-node procedural">
+                                <div class="node-title">PROCEDURAL</div>
+                                <div class="node-desc">Action patterns repeat</div>
+                            </div>
+                            <div class="evolution-node semantic">
+                                <div class="node-title">SEMANTIC</div>
+                                <div class="node-desc">Durable facts emerge</div>
+                            </div>
+                            <div class="evolution-node persona">
+                                <div class="node-title">USER/PERSONA</div>
+                                <div class="node-desc">Behavior patterns emerge</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="memory-type-stats">
+                        <div class="memory-type-stat">
+                            <span class="type-label">🎭 Episodic</span>
+                            <span class="type-value" id="episodicCount">0</span>
+                        </div>
+                        <div class="memory-type-stat">
+                            <span class="type-label">⚙️ Procedural</span>
+                            <span class="type-value" id="proceduralCount">0</span>
+                        </div>
+                        <div class="memory-type-stat">
+                            <span class="type-label">🧠 Semantic</span>
+                            <span class="type-value" id="semanticCount">0</span>
+                        </div>
+                        <div class="memory-type-stat">
+                            <span class="type-label">👤 Persona</span>
+                            <span class="type-value" id="personaCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="commodities-section">
                     <div class="commodities-header">
-                        <h2>Commodity Decisions</h2>
-                        <span id="commodityCount" class="commodity-count">0 commodities</span>
+                        <h2>SDO Recommendations</h2>
+                        <span id="commodityCount" class="commodity-count">0 recommendations</span>
                     </div>
                     <div id="commoditiesList" class="commodities-list">
                         <div class="empty-state">
                             <div class="empty-icon">�</div>
-                            <p>No commodity decisions yet. Start by submitting your first decision!</p>
+                            <p>No SDO recommendations yet. Start by submitting your first recommendation!</p>
                         </div>
                     </div>
                 </div>
@@ -215,29 +252,55 @@
     <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Edit Commodity Decision</h2>
+            <h2>Edit SDO Recommendation</h2>
             <form id="editForm">
                 <div class="form-group">
-                    <label for="editCommodityName">Commodity Name</label>
-                    <input type="text" id="editCommodityName" required>
+                    <label for="editSourceTable">Source Table</label>
+                    <input type="text" id="editSourceTable" required>
                 </div>
                 <div class="form-group">
-                    <label for="editQuantity">Quantity</label>
-                    <input type="number" id="editQuantity" required>
-                </div>
-                <div class="form-group">
-                    <label for="editUserDecision">Your Decision</label>
-                    <select id="editUserDecision" required>
-                        <option value="accepted">✅ Accept Recommendation</option>
-                        <option value="rejected">❌ Reject Recommendation</option>
-                        <option value="modified">🔄 Modify Recommendation</option>
+                    <label for="editRecommendationType">Recommendation Type</label>
+                    <select id="editRecommendationType" required>
+                        <option value="Forecast Increase">📈 Forecast Increase</option>
+                        <option value="Forecast Decrease">📉 Forecast Decrease</option>
+                        <option value="Sales Increase">💰 Sales Increase</option>
+                        <option value="Demand Decrease">📉 Demand Decrease</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="editActionDate">Action Date</label>
+                    <input type="text" id="editActionDate">
+                </div>
+                <div class="form-group">
+                    <label for="editActionTaken">Action Taken</label>
+                    <select id="editActionTaken" required>
+                        <option value="Accepted">✅ Accepted</option>
+                        <option value="Rejected">❌ Rejected</option>
+                        <option value="Auto-Accepted">🤖 Auto-Accepted</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editComment">Recommendation Comment</label>
+                    <textarea id="editComment" rows="2"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="editUserNotes">User Notes</label>
                     <textarea id="editUserNotes" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">💾 Update Decision</button>
+                <div class="form-group">
+                    <label for="editTags">Tags (comma-separated)</label>
+                    <input type="text" id="editTags">
+                </div>
+                <div class="form-group">
+                    <label for="editMemoryType">Memory Type</label>
+                    <select id="editMemoryType" required>
+                        <option value="episodic">🎭 Episodic (Specific Events)</option>
+                        <option value="procedural">⚙️ Procedural (Action Patterns)</option>
+                        <option value="semantic">🧠 Semantic (Durable Facts)</option>
+                        <option value="persona">👤 User/Persona (Behavior Patterns)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Update Recommendation</button>
             </form>
         </div>
     </div>
